@@ -1,0 +1,131 @@
+/* Landing Page Styles */
+.landing-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.landing-content {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+.landing-header {
+    margin-bottom: 60px;
+}
+
+.landing-title {
+    font-size: 56px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--text-main);
+    letter-spacing: -2px;
+}
+
+.glow-letter {
+    color: var(--primary);
+    text-shadow: 0 0 30px rgba(37, 99, 235, 0.6);
+}
+
+.landing-subtitle {
+    font-size: 18px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.landing-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 60px;
+}
+
+.feature {
+    padding: 24px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15);
+}
+
+.feature-icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.feature h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.feature p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.landing-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.cta-text {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.btn-lg {
+    padding: 16px 48px !important;
+    font-size: 16px !important;
+    border-radius: 12px !important;
+}
+
+.login-link {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .landing-title {
+        font-size: 40px;
+    }
+
+    .landing-subtitle {
+        font-size: 16px;
+    }
+
+    .landing-features {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
 
 const SUPPORTED_DRUGS = [
     "CODEINE",
@@ -10,6 +11,7 @@ const SUPPORTED_DRUGS = [
 ];
 
 export default function MedicationCard({ file, setResults, isAnalyzing, setIsAnalyzing }) {
+    const { user } = useUser();
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDrugs, setSelectedDrugs] = useState([]);
     const [error, setError] = useState("");
@@ -31,6 +33,24 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
                 ? prev.filter(d => d !== drug)
                 : [...prev, drug]
         );
+    };
+
+    const saveToHistory = (analysis) => {
+        if (!user?.id) return;
+
+        const historyKey = `history_${user.id}`;
+        const currentHistory = JSON.parse(localStorage.getItem(historyKey) || "[]");
+
+        const newEntry = {
+            timestamp: new Date().toISOString(),
+            fileName: file?.name || "Unknown",
+            medications: selectedDrugs,
+            patientId: file?.name?.split(".")[0] || "Unknown",
+            resultsCount: Array.isArray(analysis) ? analysis.length : 1,
+        };
+
+        currentHistory.push(newEntry);
+        localStorage.setItem(historyKey, JSON.stringify(currentHistory));
     };
 
     const handleAnalysis = async () => {
@@ -59,15 +79,14 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
             const data = await response.json();
             console.log("Raw backend response:", data);
 
-            // UPDATED: Simplest, most robust way to normalize.
-            // If the backend sends one object, we wrap it in an array.
-            // If it sends an array of objects, we keep it as is.
             const normalizedResults = Array.isArray(data) ? data : [data];
 
             if (normalizedResults.length === 0 || !normalizedResults[0]) {
                 throw new Error("Unexpected response format");
             }
 
+            // Save to history
+            saveToHistory(normalizedResults);
             setResults(normalizedResults);
 
         } catch (err) {
