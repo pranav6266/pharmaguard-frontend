@@ -1,53 +1,25 @@
-import UploadCard from "./components/UploadCard.jsx";
-import MedicationCard from "./components/MedicationCard.jsx";
-import Navbar from "./components/Navbar.jsx";
-import ResultsView from "./components/ResultsView.jsx";
-import {useState} from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import Landing from "./pages/Landing";
+import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
+import Dashboard from "./pages/Dashboard";
+import AuthCallback from "./pages/AuthCallback";
+import Navbar from "./components/Navbar";
 
 export default function App() {
-    const [file, setFile] = useState(null);
-    const [results, setResults] = useState(null);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const { isSignedIn } = useUser();
 
     return (
-        <>
-            <Navbar />
-            <div className="container">
-                <div className="dashboard-layout">
-
-                    {/* Left Pane: Controls */}
-                    <div className="left-column">
-                        <UploadCard
-                            file={file}
-                            setFile={setFile}
-                            setResults={setResults}
-                        />
-
-                        <MedicationCard
-                            file={file}
-                            setResults={setResults}
-                            isAnalyzing={isAnalyzing}
-                            setIsAnalyzing={setIsAnalyzing}
-                        />
-                    </div>
-
-                    {/* Right Pane: Results */}
-                    <div className="right-column">
-                        {results ? (
-                            <ResultsView results={results} />
-                        ) : (
-                            <div className="card empty-state">
-                                <span style={{ fontSize: "32px", marginBottom: "16px", display: "block" }}>📊</span>
-                                <h3 className="med-title" style={{ textAlign: "center" }}>Waiting for Data</h3>
-                                <p className="subtitle" style={{ textAlign: "center", margin: 0 }}>
-                                    Upload a patient VCF file and select targeted medications to generate the comprehensive clinical assessment.
-                                </p>
-                            </div>
-                        )}
-                    </div>
-
-                </div>
-            </div>
-        </>
+        <Router>
+            {isSignedIn && <Navbar />}
+            <Routes>
+                <Route path="/" element={isSignedIn ? <Dashboard /> : <Landing />} />
+                <Route path="/sign-up" element={<SignUp />} />
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/auth-callback" element={<AuthCallback />} />
+                <Route path="/dashboard" element={isSignedIn ? <Dashboard /> : <Landing />} />
+            </Routes>
+        </Router>
     );
 }
