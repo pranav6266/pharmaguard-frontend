@@ -32,6 +32,7 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
                 : [...prev, drug]
         );
     };
+
     const handleAnalysis = async () => {
         if (selectedDrugs.length === 0 || !file) return;
 
@@ -56,24 +57,18 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
             }
 
             const data = await response.json();
-
             console.log("Raw backend response:", data);
 
-// Normalize to ALWAYS be an array
-            const normalizedResults = Array.isArray(data)
-                ? data
-                : data?.results
-                    ? (Array.isArray(data.results) ? data.results : [data.results])
-                    : data?.drug
-                        ? [data]
-                        : [];
+            // UPDATED: Simplest, most robust way to normalize.
+            // If the backend sends one object, we wrap it in an array.
+            // If it sends an array of objects, we keep it as is.
+            const normalizedResults = Array.isArray(data) ? data : [data];
 
-            if (normalizedResults.length === 0) {
+            if (normalizedResults.length === 0 || !normalizedResults[0]) {
                 throw new Error("Unexpected response format");
             }
 
             setResults(normalizedResults);
-
 
         } catch (err) {
             console.error("Analysis failed:", err);
