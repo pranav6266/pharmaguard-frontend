@@ -1,10 +1,10 @@
-import { useState } from "react";
-import Navbar from "./components/Navbar";
-import UploadCard from "./components/UploadCard";
-import MedicationCard from "./components/MedicationCard";
-import ResultsView from "./components/ResultsView";
+import UploadCard from "./components/UploadCard.jsx";
+import MedicationCard from "./components/MedicationCard.jsx";
+import Navbar from "./components/Navbar.jsx";
+import ResultsView from "./components/ResultsView.jsx";
+import {useState} from "react";
 
-function App() {
+export default function App() {
     const [file, setFile] = useState(null);
     const [results, setResults] = useState(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -13,25 +13,41 @@ function App() {
         <>
             <Navbar />
             <div className="container">
-                <div className="column">
-                    <UploadCard
-                        file={file}
-                        setFile={setFile}
-                        setResults={setResults}
-                    />
+                <div className="dashboard-layout">
 
-                    <MedicationCard
-                        file={file}
-                        setResults={setResults}
-                        isAnalyzing={isAnalyzing}
-                        setIsAnalyzing={setIsAnalyzing}
-                    />
+                    {/* Left Pane: Controls */}
+                    <div className="left-column">
+                        <UploadCard
+                            file={file}
+                            setFile={setFile}
+                            setResults={setResults}
+                        />
 
-                    {results && <ResultsView results={results} />}
+                        <MedicationCard
+                            file={file}
+                            setResults={setResults}
+                            isAnalyzing={isAnalyzing}
+                            setIsAnalyzing={setIsAnalyzing}
+                        />
+                    </div>
+
+                    {/* Right Pane: Results */}
+                    <div className="right-column">
+                        {results ? (
+                            <ResultsView results={results} />
+                        ) : (
+                            <div className="card empty-state">
+                                <span style={{ fontSize: "32px", marginBottom: "16px", display: "block" }}>📊</span>
+                                <h3 className="med-title" style={{ textAlign: "center" }}>Waiting for Data</h3>
+                                <p className="subtitle" style={{ textAlign: "center", margin: 0 }}>
+                                    Upload a patient VCF file and select targeted medications to generate the comprehensive clinical assessment.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
                 </div>
             </div>
         </>
     );
 }
-
-export default App;
