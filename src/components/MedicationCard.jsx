@@ -57,27 +57,23 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
 
             const data = await response.json();
 
-            // --- BULLETPROOF PARSING LOGIC ---
             console.log("Raw backend response:", data);
 
-            let analysisResults = [];
+// Normalize to ALWAYS be an array
+            const normalizedResults = Array.isArray(data)
+                ? data
+                : data?.results
+                    ? (Array.isArray(data.results) ? data.results : [data.results])
+                    : data?.drug
+                        ? [data]
+                        : [];
 
-            if (Array.isArray(data)) {
-                // Scenario 1: It's a clean array of objects
-                analysisResults = data;
-            } else if (data && data.results) {
-                // Scenario 2: It's wrapped in a "results" key (could be an array or a single object)
-                analysisResults = Array.isArray(data.results) ? data.results : [data.results];
-            } else if (data && data.drug) {
-                // Scenario 3: It's a single object matching the hackathon schema directly
-                analysisResults = data;
-            } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-                // Fallback: Wrap whatever object it is in an array
-                analysisResults = [data.results];
+            if (normalizedResults.length === 0) {
+                throw new Error("Unexpected response format");
             }
 
-            // Filter out any undefined or empty array elements just in case
-            setResults(analysisResults.filter(Boolean));
+            setResults(normalizedResults);
+
 
         } catch (err) {
             console.error("Analysis failed:", err);

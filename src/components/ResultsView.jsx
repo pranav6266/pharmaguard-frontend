@@ -37,7 +37,12 @@ export default function ResultsView({ results }) {
     };
 
     // Ensure results is an array to map over
-    const safeResults = Array.isArray(results) ? results : [];
+    const safeResults = Array.isArray(results)
+        ? results
+        : results?.drug
+            ? [results]
+            : [];
+
 
     return (
         <div className="card results-card">
