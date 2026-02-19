@@ -32,7 +32,6 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
                 : [...prev, drug]
         );
     };
-
     const handleAnalysis = async () => {
         if (selectedDrugs.length === 0 || !file) return;
 
@@ -47,7 +46,6 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
                 formData.append("drugs", drug);
             });
 
-            // UPDATED: Pointing to /full-analysis endpoint
             const response = await fetch("https://pharmaguard-production.up.railway.app/full-analysis", {
                 method: "POST",
                 body: formData,
@@ -58,9 +56,28 @@ export default function MedicationCard({ file, setResults, isAnalyzing, setIsAna
             }
 
             const data = await response.json();
-            // Assuming the backend returns an array directly, or an object with a "results" array
-            const analysisResults = Array.isArray(data) ? data : (data.results || []);
-            setResults(analysisResults);
+
+            // --- BULLETPROOF PARSING LOGIC ---
+            console.log("Raw backend response:", data);
+
+            let analysisResults = [];
+
+            if (Array.isArray(data)) {
+                // Scenario 1: It's a clean array of objects
+                analysisResults = data;
+            } else if (data && data.results) {
+                // Scenario 2: It's wrapped in a "results" key (could be an array or a single object)
+                analysisResults = Array.isArray(data.results) ? data.results : [data.results];
+            } else if (data && data.drug) {
+                // Scenario 3: It's a single object matching the hackathon schema directly
+                analysisResults = data;
+            } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                // Fallback: Wrap whatever object it is in an array
+                analysisResults = [data.results];
+            }
+
+            // Filter out any undefined or empty array elements just in case
+            setResults(analysisResults.filter(Boolean));
 
         } catch (err) {
             console.error("Analysis failed:", err);
